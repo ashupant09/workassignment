@@ -1,3 +1,5 @@
 package com.assignment.repo.pojo
 
-data class DeveloperList(var developerData: ArrayList<Developers>?)
+import com.assignment.repo.network.AppResponse
+
+data class DeveloperList(var developerData: ArrayList<Developers>?): AppResponse

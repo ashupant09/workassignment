@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.assignment.repo.di.component.DaggerViewModelInjector
 import com.assignment.repo.di.module.NetworkModule
 
-class BaseViewModel: ViewModel() {
+open class BaseViewModel: ViewModel() {
     private val injector = DaggerViewModelInjector
         .builder()
         .networkModule(NetworkModule)
