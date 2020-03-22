@@ -3,6 +3,8 @@ package com.assignment.repo.ui.view
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.MutableLiveData
@@ -11,12 +13,14 @@ import com.assignment.repo.R
 import com.assignment.repo.pojo.Developers
 import com.squareup.picasso.Picasso
 
-class DeveloperAdapter: RecyclerView.Adapter<DeveloperAdapter.DeveloperViewHolder>() {
+class DeveloperAdapter: RecyclerView.Adapter<DeveloperAdapter.DeveloperViewHolder>(),Filterable {
 
     var developerList: ArrayList<Developers> = arrayListOf()
+    var developerListFiltered: ArrayList<Developers> = arrayListOf()
 
     fun setDeveloperListData(developerList: List<Developers>){
-        this.developerList = developerList as ArrayList<Developers>
+        this.developerListFiltered = developerList as ArrayList<Developers>
+        this.developerList = developerListFiltered
         notifyDataSetChanged()
     }
 
@@ -33,11 +37,11 @@ class DeveloperAdapter: RecyclerView.Adapter<DeveloperAdapter.DeveloperViewHolde
 
     override fun getItemCount(): Int {
 
-        return developerList.size
+        return developerListFiltered.size
     }
 
     override fun onBindViewHolder(holder: DeveloperViewHolder, position: Int) {
-        val data = developerList
+        val data = developerListFiltered
 
         data[position].avatar?.let {
             Picasso.get()
@@ -59,6 +63,34 @@ class DeveloperAdapter: RecyclerView.Adapter<DeveloperAdapter.DeveloperViewHolde
         }else{
             holder.viewSeparater.visibility = View.VISIBLE
         }
+    }
+
+    override fun getFilter(): Filter {
+        return (object : Filter(){
+            override fun performFiltering(charSequence: CharSequence?): FilterResults {
+                val charString = charSequence.toString()
+                if(charString.isEmpty()){
+                    developerListFiltered = developerList
+                }else{
+                    var filteredRepo = arrayListOf<Developers>()
+                    for(i in 0 until developerList.size){
+                        if(developerList[i].name?.toLowerCase()?.contains(charString) == true){
+                            filteredRepo.add(developerList[i])
+                        }
+                    }
+
+                    developerListFiltered = filteredRepo
+                }
+                val filterResult = FilterResults()
+                filterResult.values = developerListFiltered
+                return filterResult
+            }
+
+            override fun publishResults(charSequence: CharSequence?, results: FilterResults?) {
+                developerListFiltered = results?.values as ArrayList<Developers>
+                notifyDataSetChanged()
+            }
+        })
     }
 
     class DeveloperViewHolder(item: View): RecyclerView.ViewHolder(item){

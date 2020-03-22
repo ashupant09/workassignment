@@ -2,6 +2,8 @@ package com.assignment.repo.ui.view
 
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -62,6 +64,20 @@ class RepositoryListFragment : Fragment() {
                     Toast.makeText(context, state.data as String, Toast.LENGTH_SHORT).show()
                     progress_layout.visibility = if(state.isLoading) View.VISIBLE else View.GONE
                 }
+            }
+        })
+
+        et_search_repo.addTextChangedListener(object: TextWatcher{
+            override fun afterTextChanged(text: Editable?) {
+                repoAdapter.filter.filter(text)
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
             }
         })
     }

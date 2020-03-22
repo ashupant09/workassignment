@@ -3,20 +3,23 @@ package com.assignment.repo.ui.view
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.assignment.repo.R
 import com.assignment.repo.pojo.Repositories
 import com.squareup.picasso.Picasso
 
-class RepoAdapter: RecyclerView.Adapter<RepoAdapter.RepoItemViewHolder>(){
+class RepoAdapter: RecyclerView.Adapter<RepoAdapter.RepoItemViewHolder>(), Filterable{
 
     var repoList: ArrayList<Repositories> = arrayListOf()
+    var repoListFiltered: ArrayList<Repositories> = arrayListOf()
 
     fun setrepoListData(repoList: List<Repositories>){
-        this.repoList = repoList as ArrayList<Repositories>
+        this.repoListFiltered = repoList as ArrayList<Repositories>
+        this.repoList = repoListFiltered
         notifyDataSetChanged()
     }
 
@@ -26,11 +29,11 @@ class RepoAdapter: RecyclerView.Adapter<RepoAdapter.RepoItemViewHolder>(){
     }
 
     override fun getItemCount(): Int {
-        return repoList.size
+        return repoListFiltered.size
     }
 
     override fun onBindViewHolder(holder: RepoItemViewHolder, position: Int) {
-        val data = repoList
+        val data = repoListFiltered
 
         data[position].avatar?.let {
             Picasso.get()
@@ -57,6 +60,37 @@ class RepoAdapter: RecyclerView.Adapter<RepoAdapter.RepoItemViewHolder>(){
         }
 
     }
+
+
+    override fun getFilter(): Filter{
+        return (object : Filter(){
+            override fun performFiltering(charSequence: CharSequence?): FilterResults {
+                val charString = charSequence.toString()
+                if(charString.isEmpty()){
+                    repoListFiltered = repoList
+                }else{
+                    var filteredRepo = arrayListOf<Repositories>()
+                    for(i in 0 until repoList.size){
+                        if(repoList[i].author?.toLowerCase()?.contains(charString) == true){
+                            filteredRepo.add(repoList[i])
+                        }
+                    }
+
+                    repoListFiltered = filteredRepo
+                }
+                val filterResult = FilterResults()
+                filterResult.values = repoListFiltered
+                return filterResult
+            }
+
+            override fun publishResults(charSequence: CharSequence?, results: FilterResults?) {
+                repoListFiltered = results?.values as ArrayList<Repositories>
+                notifyDataSetChanged()
+            }
+        })
+    }
+
+
 
 
     class RepoItemViewHolder(item: View): RecyclerView.ViewHolder(item){
