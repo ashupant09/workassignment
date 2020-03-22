@@ -6,16 +6,32 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.assignment.repo.R
+import com.assignment.repo.di.ViewModelFactory
 import com.assignment.repo.network.State
+import com.assignment.repo.pojo.DeveloperList
 import com.assignment.repo.pojo.RepoList
 import com.assignment.repo.ui.viewmodel.DeveloperViewModel
+import kotlinx.android.synthetic.main.fragment_developers_list.*
 
 class DevelopersListFragment : Fragment() {
 
     lateinit var viewModel: DeveloperViewModel
+    private val developerAdapter: DeveloperAdapter by lazy {
+        DeveloperAdapter()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        activity?.run {
+            viewModel = ViewModelProvider(this, ViewModelFactory(activity)).get(DeveloperViewModel::class.java)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,20 +43,25 @@ class DevelopersListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.repositoryData.observe(viewLifecycleOwner, Observer {
+        developer_recycler.apply {
+            adapter = developerAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+        viewModel.developerData.observe(viewLifecycleOwner, Observer {
                 state->
             when(state){
                 is State.isLoading ->
-                    state.isLoading
+                    progress_layout.visibility = if(state.isLoading) View.VISIBLE else View.GONE
 
                 is State.onSuccess ->{
-                    state.data is RepoList
-                    state.isLoading
+                    if((state.data as DeveloperList).developerData!!.isNotEmpty())
+                        developerAdapter.setDeveloperListData((state.data as DeveloperList).developerData!!)
+                        progress_layout.visibility = if(state.isLoading) View.VISIBLE else View.GONE
                 }
 
                 is State.onFailure ->{
-                    state.data
-                    state.isLoading
+                    Toast.makeText(context, state.data as String, Toast.LENGTH_SHORT).show()
+                    progress_layout.visibility = if(state.isLoading) View.VISIBLE else View.GONE
                 }
             }
         })

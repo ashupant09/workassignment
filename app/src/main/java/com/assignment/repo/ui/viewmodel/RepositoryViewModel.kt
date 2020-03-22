@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.assignment.repo.base.BaseViewModel
 import com.assignment.repo.network.PostApi
 import com.assignment.repo.network.State
+import com.assignment.repo.pojo.RepoList
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -42,7 +43,7 @@ class RepositoryViewModel: BaseViewModel() {
                     if(result.isSuccessful){
                         when(result.code()){
                             200 -> {
-                                repositoryData.value = State.onSuccess(result.body())
+                                repositoryData.value = State.onSuccess(RepoList(result.body()))
                             }
                             else ->{
                                 repositoryData.value = State.onFailure("some error")

@@ -1,7 +1,7 @@
 package com.assignment.repo.pojo
 
 data class Repositories(
-    var autor:String?,
+    var author:String?,
     var name:String?,
     var avatar: String?,
     var url: String?,

@@ -11,8 +11,8 @@ import retrofit2.http.GET
 interface PostApi {
 
     @GET("/repositories")
-    fun getRepository(): Observable<Response<AppResponse>>
+    fun getRepository(): Observable<Response<List<Repositories>>>
 
     @GET("/developers")
-    fun getDevelopers(): Observable<Response<RepoList>>
+    fun getDevelopers(): Observable<Response<List<Developers>>>
 }

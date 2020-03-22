@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.assignment.repo.base.BaseViewModel
 import com.assignment.repo.network.PostApi
 import com.assignment.repo.network.State
+import com.assignment.repo.pojo.DeveloperList
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -13,7 +14,7 @@ class DeveloperViewModel: BaseViewModel() {
     @Inject
     lateinit var postApi: PostApi
 
-    val repositoryData: MutableLiveData<State> = MutableLiveData()
+    val developerData: MutableLiveData<State> = MutableLiveData()
 
     private lateinit var subscription: Disposable
 
@@ -31,29 +32,29 @@ class DeveloperViewModel: BaseViewModel() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe{
-                repositoryData.value = State.isLoading(true)
+                developerData.value = State.isLoading(true)
             }
             .doOnTerminate{
-                repositoryData.value = State.isLoading(false)
+                developerData.value = State.isLoading(false)
             }
             .subscribe(
                 {result->
                     if(result.isSuccessful){
                         when(result.code()){
                             200 -> {
-                                repositoryData.value = State.onSuccess(result.body())
+                                developerData.value = State.onSuccess(DeveloperList(result.body()))
                             }
                             else ->{
-                                repositoryData.value = State.onFailure("some error")
+                                developerData.value = State.onFailure("some error")
                             }
                         }
                     }else{
-                        repositoryData.value = State.onFailure("some error")
+                        developerData.value = State.onFailure("some error")
                     }
                 },
                 {
                         error->
-                    repositoryData.value = State.onFailure(error.message)
+                    developerData.value = State.onFailure(error.message)
                 }
             )
     }
