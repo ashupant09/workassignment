@@ -18,13 +18,14 @@ import com.assignment.repo.di.ViewModelFactory
 import com.assignment.repo.network.State
 import com.assignment.repo.pojo.RepoList
 import com.assignment.repo.ui.viewmodel.RepositoryViewModel
+import com.assignment.repo.utils.AppUtil
 import kotlinx.android.synthetic.main.fragment_repository_list.*
 
 class RepositoryListFragment : Fragment() {
 
     private lateinit var viewModel: RepositoryViewModel
     private val repoAdapter: RepoAdapter by lazy {
-        RepoAdapter()
+        RepoAdapter(context)
     }
 
     override fun onCreateView(
@@ -66,6 +67,14 @@ class RepositoryListFragment : Fragment() {
                 }
             }
         })
+
+        context?.run{
+            if(AppUtil.isNetworkConnected(this)){
+                viewModel.loadRepoData()
+            }else{
+                viewModel.repositoryData.value = State.onFailure("Internet not connected")
+            }
+        }
 
         et_search_repo.addTextChangedListener(object: TextWatcher{
             override fun afterTextChanged(text: Editable?) {

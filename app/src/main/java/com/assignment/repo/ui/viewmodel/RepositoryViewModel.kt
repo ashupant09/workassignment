@@ -10,7 +10,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class RepositoryViewModel: BaseViewModel() {
+class RepositoryViewModel : BaseViewModel() {
 
     @Inject
     lateinit var postApi: PostApi
@@ -19,42 +19,38 @@ class RepositoryViewModel: BaseViewModel() {
 
     private lateinit var subscription: Disposable
 
-    init {
-        loadRepoData()
-    }
 
     override fun onCleared() {
         super.onCleared()
         subscription.dispose()
     }
 
-    private fun loadRepoData(){
+    fun loadRepoData() {
         subscription = postApi.getRepository()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe{
+            .doOnSubscribe {
                 repositoryData.value = State.isLoading(true)
             }
-            .doOnTerminate{
+            .doOnTerminate {
                 repositoryData.value = State.isLoading(false)
             }
             .subscribe(
-                {result->
-                    if(result.isSuccessful){
-                        when(result.code()){
+                { result ->
+                    if (result.isSuccessful) {
+                        when (result.code()) {
                             200 -> {
                                 repositoryData.value = State.onSuccess(RepoList(result.body()))
                             }
-                            else ->{
+                            else -> {
                                 repositoryData.value = State.onFailure("some error")
                             }
                         }
-                    }else{
+                    } else {
                         repositoryData.value = State.onFailure("some error")
                     }
                 },
-                {
-                    error->
+                { error ->
                     repositoryData.value = State.onFailure(error.message)
                 }
             )

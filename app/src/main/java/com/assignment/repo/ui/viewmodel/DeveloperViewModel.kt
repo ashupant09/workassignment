@@ -10,7 +10,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class DeveloperViewModel: BaseViewModel() {
+class DeveloperViewModel : BaseViewModel() {
     @Inject
     lateinit var postApi: PostApi
 
@@ -18,42 +18,37 @@ class DeveloperViewModel: BaseViewModel() {
 
     private lateinit var subscription: Disposable
 
-    init {
-        loadDevelperData()
-    }
-
     override fun onCleared() {
         super.onCleared()
         subscription.dispose()
     }
 
-    private fun loadDevelperData(){
+    fun loadDevelperData() {
         subscription = postApi.getDevelopers()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe{
+            .doOnSubscribe {
                 developerData.value = State.isLoading(true)
             }
-            .doOnTerminate{
+            .doOnTerminate {
                 developerData.value = State.isLoading(false)
             }
             .subscribe(
-                {result->
-                    if(result.isSuccessful){
-                        when(result.code()){
+                { result ->
+                    if (result.isSuccessful) {
+                        when (result.code()) {
                             200 -> {
                                 developerData.value = State.onSuccess(DeveloperList(result.body()))
                             }
-                            else ->{
+                            else -> {
                                 developerData.value = State.onFailure("some error")
                             }
                         }
-                    }else{
+                    } else {
                         developerData.value = State.onFailure("some error")
                     }
                 },
-                {
-                        error->
+                { error ->
                     developerData.value = State.onFailure(error.message)
                 }
             )

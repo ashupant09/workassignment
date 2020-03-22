@@ -1,5 +1,8 @@
 package com.assignment.repo.ui.view
 
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +15,7 @@ import com.assignment.repo.R
 import com.assignment.repo.pojo.Repositories
 import com.squareup.picasso.Picasso
 
-class RepoAdapter: RecyclerView.Adapter<RepoAdapter.RepoItemViewHolder>(), Filterable{
+class RepoAdapter(private val context: Context?): RecyclerView.Adapter<RepoAdapter.RepoItemViewHolder>(), Filterable{
 
     var repoList: ArrayList<Repositories> = arrayListOf()
     var repoListFiltered: ArrayList<Repositories> = arrayListOf()
@@ -57,6 +60,15 @@ class RepoAdapter: RecyclerView.Adapter<RepoAdapter.RepoItemViewHolder>(), Filte
             holder.viewSeparater.visibility = View.GONE
         }else{
             holder.viewSeparater.visibility = View.VISIBLE
+        }
+
+        holder.itemView.setOnClickListener {
+            val bundle = Bundle().apply {
+                putParcelable("repoData", data[position])
+            }
+            context?.run{
+                this.startActivity(Intent(this, RepoDetailActivity::class.java).putExtras(bundle))
+            }
         }
 
     }

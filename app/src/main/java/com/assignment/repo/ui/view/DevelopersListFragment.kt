@@ -19,6 +19,7 @@ import com.assignment.repo.network.State
 import com.assignment.repo.pojo.DeveloperList
 import com.assignment.repo.pojo.RepoList
 import com.assignment.repo.ui.viewmodel.DeveloperViewModel
+import com.assignment.repo.utils.AppUtil
 import kotlinx.android.synthetic.main.fragment_developers_list.*
 
 class DevelopersListFragment : Fragment() {
@@ -67,6 +68,13 @@ class DevelopersListFragment : Fragment() {
                 }
             }
         })
+        context?.run{
+            if(AppUtil.isNetworkConnected(this)){
+                viewModel.loadDevelperData()
+            }else{
+                viewModel.developerData.value = State.onFailure("Internet not connected")
+            }
+        }
 
         et_search_developer.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(text: Editable?) {
